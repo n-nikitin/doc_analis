@@ -1,0 +1,72 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+typedef struct {
+    char * a;        // number is a[0]*10^0 + a[1]*10^1 + ..+ a[n]*10^n
+    unsigned int n;  // наибольшая степень десяти
+    size_t  size;    // размер массива a
+}Decimal;
+
+void elong_set_int(Decimal * px, unsigned int number)
+{
+    if (number == 0){       // 0*10**0
+        px->size = 1;
+        px->n = 0;
+        px->a = malloc(px->size);
+        px->a[0] = 0;
+        return;
+    }
+
+
+    // number точно меньше 10 в 100, выделим память с запасом
+    px->size = 100;
+    px->a = malloc(px->size);
+
+
+
+
+    for(px->n = 0; number > 0; px->n++){
+        px->a[px->n] = number % 10;
+        number /= 10;
+    }
+    px->n --;
+
+
+    // выделим памяти точно под хранение числа
+    px->size = px->n + 1;
+    px->a = realloc(px->a, px->size);
+}
+
+void elong_print(Decimal *px){
+    for(int i=px->n; i >= 0; i--){
+        printf("%d", px->a[i]);
+    }
+}
+
+void elong_destroy(Decimal * px)
+{
+    free(px->a);        // освобождаем желтый массив с цифрами
+}
+
+void elong_check(Decimal * px){
+    for (int i = 0; i < px->size; i++) {
+        if (!isdigit('0' + (px->a[i]))) {
+            printf("No, символ %c в позиции %d не является числом\n", px->a[i], i);
+            return;
+        }
+    }
+    printf("Все символы в массиве - числа.\n");
+}
+    
+
+int main()
+{
+    Decimal x;
+    elong_set_int(&x, 147);
+    elong_print(&x);
+    elong_check(&x);
+    elong_destroy(&x);
+    return 0;
+}
